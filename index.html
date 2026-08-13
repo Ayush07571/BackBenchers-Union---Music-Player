@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Back Benchers Union</title>
-<meta name="description" content="Back Benchers Union — headphones on, brain elsewhere. A late-night playlist for the ones still up.">
-<meta property="og:title" content="Back Benchers Union">
-<meta property="og:description" content="Headphones on, brain elsewhere. A late-night playlist for the ones still up.">
+<title>After Hours — Your Late-Night Playlist</title>
+<meta name="description" content="After Hours — a place for good music, late nights, quiet moments, and whatever you feel like listening to.">
+<meta property="og:title" content="After Hours">
+<meta property="og:description" content="A late-night playlist for whatever mood finds you.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="backdrop.png">
-<meta property="og:image:alt" content="Back Benchers Union — a late-night study and music space">
+<meta property="og:image:alt" content="After Hours — a late-night music space">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Back Benchers Union">
-<meta name="twitter:description" content="Headphones on, brain elsewhere. A late-night playlist for the ones still up.">
+<meta name="twitter:title" content="After Hours">
+<meta name="twitter:description" content="A late-night playlist for whatever mood finds you.">
 <meta name="twitter:image" content="backdrop.png">
 <meta name="theme-color" content="#0b0f16">
 
 <!-- Minimal moon + headphones favicon / site logo -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f16'/%3E%3Ccircle cx='38' cy='25' r='14' fill='%23ffcf7a'/%3E%3Ccircle cx='44' cy='20' r='14' fill='%230b0f16'/%3E%3Cpath d='M17 38a15 15 0 0 1 30 0v8a5 5 0 0 1-10 0v-7a5 5 0 0 1 10 0' fill='none' stroke='%23f1ecdf' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f16'/%3E%3Ccircle cx='29' cy='27' r='16' fill='%23ffcf7a'/%3E%3Ccircle cx='37' cy='21' r='16' fill='%230b0f16'/%3E%3Cpath d='M39 35v16c0 4-3 7-7 7-3 0-6-2-6-5s3-5 6-5c2 0 4 1 5 2V27l15-4v14c0 4-3 7-7 7-3 0-6-2-6-5s3-5 6-5c2 0 4 1 5 2v-8z' fill='%23f1ecdf'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f16'/%3E%3Ccircle cx='38' cy='25' r='14' fill='%23ffcf7a'/%3E%3Ccircle cx='44' cy='20' r='14' fill='%230b0f16'/%3E%3Cpath d='M17 38a15 15 0 0 1 30 0v8a5 5 0 0 1-10 0v-7a5 5 0 0 1 10 0' fill='none' stroke='%23f1ecdf' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,400&family=Yatra+One&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -44,7 +44,7 @@
     height:100vh;
     background-image:url('backdrop.png');
     background-size:cover;
-    background-position:center 30%;
+    background-position:center center;
   }
   .stage::after{
     content:'';
@@ -264,20 +264,19 @@
     <div class="links" id="linksWrap">
       <a href="#" id="spotifyLink" target="_blank" rel="noopener" style="display:none;">♫ <span class="label">Spotify</span> ↗</a>
       <a href="#" id="youtubeLink" target="_blank" rel="noopener" style="display:none;">▶ <span class="label">YouTube</span> ↗</a>
-      <a href="#" id="ytMusicLink" target="_blank" rel="noopener" style="display:none;">▷ <span class="label">YT Music</span> ↗</a>
+      <a href="#" id="ytMusicLink" target="_blank" rel="noopener" style="display:none;">▷ <span class="label">YouTube Music</span> ↗</a>
     </div>
-  </div>
-
-  <div class="title-wrap">
-    <div class="brand-mark" aria-hidden="true">☾</div>
-    <h1>Back Benchers <em>Union</em></h1>
-    <p class="sub">headphones on, brain elsewhere — for the ones still up.</p>
+  </div>  <div class="title-wrap">
+    <div class="eyebrow">late night / now playing</div>
+    <div class="brand-mark" aria-hidden="true">♫</div>
+    <h1>After <em>Hours</em></h1>
+    <p class="sub">good music, quiet nights, <em>whatever comes next.</em></p>
   </div>
 
   <div class="player">
     <div class="thumb" id="thumb"></div>
     <div class="meta">
-      <div class="track-title" id="trackTitle">tap play to start</div>
+      <div class="track-title" id="trackTitle">tap play to listen</div>
       <div class="track-artist" id="trackArtist">your playlist</div>
       <div class="progress-row">
         <div class="bar"><div class="bar-fill" id="barFill"></div></div>
@@ -445,7 +444,7 @@
             const data = ytPlayer.getVideoData();
             playedVideoIds.add(data.video_id);
             trackTitle.textContent = data.title || 'now playing';
-            trackArtist.textContent = (data.author || 'your playlist') + (inMixFallback ? ' · mix' : '');
+            trackArtist.textContent = (data.author || 'after hours') + (inMixFallback ? ' · mix' : '');
             clearInterval(progressTimer);
             progressTimer = setInterval(updateProgress, 500);
           } else if(e.data === YT.PlayerState.PAUSED){
