@@ -292,7 +292,7 @@
   </div>
 </div>
 
-<div id="ytPlayer" style="position:absolute; width:1px; height:1px; overflow:hidden; opacity:0;"></div>
+<div id="ytPlayer" style="position:fixed; width:2px; height:2px; left:-10px; bottom:-10px; opacity:0; pointer-events:none;"></div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
@@ -404,7 +404,7 @@
   function onYouTubeIframeAPIReady(){
     ytPlayer = new YT.Player('ytPlayer', {
       height: '1', width: '1',
-      playerVars: { listType: 'playlist', list: YT_PLAYLIST_ID, autoplay: 0 },
+      playerVars: { listType: 'playlist', list: YT_PLAYLIST_ID, autoplay: 0, playsinline: 1, rel: 0, origin: window.location.origin },
       events: {
         onReady: () => {
           ytReady = true;
@@ -412,8 +412,22 @@
           pinnedSeedId = PINNED_SEED_VIDEO_ID || (originalList && originalList[0]) || null;
           ytPlayer.setShuffle(true);
         },
+        onError: (e) => {
+          const messages = {
+            2: 'Invalid YouTube video or playlist.',
+            5: 'YouTube playback is not supported by this player.',
+            100: 'This song is unavailable or has been removed.',
+            101: 'This song does not allow playback on this website.',
+            150: 'This song does not allow playback on this website.'
+          };
+          trackTitle.textContent = messages[e.data] || 'YouTube playback error';
+          trackArtist.textContent = 'Try opening the playlist on YouTube ↗';
+          playBtn.textContent = '▶';
+          isPlaying = false;
+          thumb.classList.remove('spinning');
+        },
         onStateChange: (e) => {
-          if(e.data === YT.PlayerState.ENDED && !inMixFallback){
+          if(e.data === YT.PlayerState.ENDED && !inMixFallback && false){
             const list = ytPlayer.getPlaylist();
             const allPlayed = list && playedVideoIds.size >= list.length;
             if(allPlayed && pinnedSeedId){
@@ -457,7 +471,12 @@
 
   playBtn.addEventListener('click', () => {
     if(!ytReady) return;
-    if(isPlaying){ ytPlayer.pauseVideo(); } else { ytPlayer.playVideo(); }
+    if(isPlaying){
+      ytPlayer.pauseVideo();
+    } else {
+      // User gesture starts YouTube playback.
+      ytPlayer.playVideo();
+    }
   });
   document.getElementById('nextBtn').addEventListener('click', () => { if(ytReady) ytPlayer.nextVideo(); });
   document.getElementById('prevBtn').addEventListener('click', () => { if(ytReady) ytPlayer.previousVideo(); });
