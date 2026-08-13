@@ -8,6 +8,17 @@
 <meta property="og:title" content="Back Benchers Union">
 <meta property="og:description" content="Headphones on, brain elsewhere. A late-night playlist for the ones still up.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="backdrop.png">
+<meta property="og:image:alt" content="Back Benchers Union — a late-night study and music space">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Back Benchers Union">
+<meta name="twitter:description" content="Headphones on, brain elsewhere. A late-night playlist for the ones still up.">
+<meta name="twitter:image" content="backdrop.png">
+<meta name="theme-color" content="#0b0f16">
+
+<!-- Minimal moon + headphones favicon / site logo -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f16'/%3E%3Ccircle cx='38' cy='25' r='14' fill='%23ffcf7a'/%3E%3Ccircle cx='44' cy='20' r='14' fill='%230b0f16'/%3E%3Cpath d='M17 38a15 15 0 0 1 30 0v8a5 5 0 0 1-10 0v-7a5 5 0 0 1 10 0' fill='none' stroke='%23f1ecdf' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0f16'/%3E%3Ccircle cx='38' cy='25' r='14' fill='%23ffcf7a'/%3E%3Ccircle cx='44' cy='20' r='14' fill='%230b0f16'/%3E%3Cpath d='M17 38a15 15 0 0 1 30 0v8a5 5 0 0 1-10 0v-7a5 5 0 0 1 10 0' fill='none' stroke='%23f1ecdf' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,400&family=Yatra+One&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -80,6 +91,20 @@
     transition:opacity .2s;
   }
   .links a:hover{ opacity:1; color:var(--amber-soft); }
+
+  .brand-mark{
+    width:28px;
+    height:28px;
+    margin:0 auto 10px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(255,207,122,0.35);
+    border-radius:50%;
+    color:var(--amber-soft);
+    font-size:16px;
+    background:rgba(11,15,22,0.28);
+    box-shadow:0 0 24px rgba(232,165,86,0.12);
+  }
 
   .title-wrap{
     position:absolute;
@@ -224,7 +249,7 @@
     .track-title, .track-artist{ max-width:110px; }
     .title-wrap{ top:12%; }
     h1{ font-size:20px; }
-    .links a span.label{ display:none; }
+    .links{ gap:10px; }\n    .links a span.label{ display:none; }
   }
 </style>
 </head>
@@ -238,11 +263,13 @@
     </div>
     <div class="links" id="linksWrap">
       <a href="#" id="spotifyLink" target="_blank" rel="noopener" style="display:none;">♫ <span class="label">Spotify</span> ↗</a>
+      <a href="#" id="youtubeLink" target="_blank" rel="noopener" style="display:none;">▶ <span class="label">YouTube</span> ↗</a>
       <a href="#" id="ytMusicLink" target="_blank" rel="noopener" style="display:none;">▷ <span class="label">YT Music</span> ↗</a>
     </div>
   </div>
 
   <div class="title-wrap">
+    <div class="brand-mark" aria-hidden="true">☾</div>
     <h1>Back Benchers <em>Union</em></h1>
     <p class="sub">headphones on, brain elsewhere — for the ones still up.</p>
   </div>
@@ -269,14 +296,23 @@
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-  // 👉 Paste your real playlist links here. Leave as "" to hide the link.
-  const SPOTIFY_PLAYLIST_URL = ""; // e.g. "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"
-  const YT_MUSIC_URL = "";         // e.g. "https://www.youtube.com/playlist?list=PLxxxxxxxxxxxx"
+  // 👉 Add your external playlist links here.
+  // YouTube is automatically connected to the same playlist used by the player below.
+  const SPOTIFY_PLAYLIST_URL = ""; // e.g. "https://open.spotify.com/playlist/..."
+  const YT_MUSIC_URL = "";         // optional: "https://music.youtube.com/playlist?list=..."
 
   const spotifyLink = document.getElementById('spotifyLink');
+  const youtubeLink = document.getElementById('youtubeLink');
   const ytMusicLink = document.getElementById('ytMusicLink');
-  if(SPOTIFY_PLAYLIST_URL){ spotifyLink.href = SPOTIFY_PLAYLIST_URL; spotifyLink.style.display = 'flex'; }
-  if(YT_MUSIC_URL){ ytMusicLink.href = YT_MUSIC_URL; ytMusicLink.style.display = 'flex'; }
+
+  if(SPOTIFY_PLAYLIST_URL){
+    spotifyLink.href = SPOTIFY_PLAYLIST_URL;
+    spotifyLink.style.display = 'flex';
+  }
+  if(YT_MUSIC_URL){
+    ytMusicLink.href = YT_MUSIC_URL;
+    ytMusicLink.style.display = 'flex';
+  }
 
   function tick(){
     const d = new Date();
@@ -331,9 +367,16 @@
     onlineWrap.style.display = 'none';
   }
 
-  // 👉 replace with your own playlist ID
-  // find it in the URL of your playlist: youtube.com/playlist?list=THIS_PART
+  // 👉 Replace with your YouTube playlist ID.
+  // Find it in: youtube.com/playlist?list=THIS_PART
   const YT_PLAYLIST_ID = "PL7B34S0Z1qGxE8spoH0xitKG-3jLI5CyZ";
+
+  // "Listen on YouTube" always points to the exact playlist powering the player.
+  if(YT_PLAYLIST_ID){
+    const youtubePlaylistUrl = "https://www.youtube.com/playlist?list=" + YT_PLAYLIST_ID;
+    youtubeLink.href = youtubePlaylistUrl;
+    youtubeLink.style.display = 'flex';
+  }
 
   let ytPlayer, ytReady = false, isPlaying = false, progressTimer;
   const playBtn = document.getElementById('playBtn');
