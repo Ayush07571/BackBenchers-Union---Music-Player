@@ -289,6 +289,36 @@
   }
   .rain-icon{ font-size:13px; }
 
+  .mixer{
+    position:absolute;
+    z-index:6;
+    right:26px;
+    bottom:calc(68px + env(safe-area-inset-bottom));
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:9px 13px;
+    border-radius:100px;
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    box-shadow:0 12px 30px rgba(0,0,0,0.4);
+  }
+  .mixer-control{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .mixer-control input{
+    width:82px;
+    height:14px;
+    accent-color:var(--amber-soft);
+    cursor:pointer;
+  }
+
   .debug-panel{
     position:absolute;
     z-index:9;
@@ -332,15 +362,23 @@
     .thumb{ width:38px; height:38px; }
     .meta{ min-width:0; flex:1; }
     .track-title, .track-artist{ max-width:100%; }
-    .bar{ width:auto; flex:1; min-width:50px; }
+    .seek-bar{ width:auto; flex:1; min-width:50px; }
     .controls{ gap:8px; padding-left:8px; }
     .play-btn{ width:34px; height:34px; }
 
     .rain-toggle{
       right:50%;
       transform:translateX(50%);
-      bottom:calc(96px + env(safe-area-inset-bottom));
+      bottom:calc(122px + env(safe-area-inset-bottom));
     }
+    .mixer{
+      right:50%;
+      transform:translateX(50%);
+      bottom:calc(78px + env(safe-area-inset-bottom));
+      gap:9px;
+      padding:7px 10px;
+    }
+    .mixer-control input{ width:70px; }
   }
 
   @media (max-width:380px){
@@ -388,15 +426,29 @@
       <div class="track-title" id="trackTitle">tap play to listen</div>
       <div class="track-artist" id="trackArtist">your playlist</div>
       <div class="progress-row">
-        <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+        <input class="seek-bar" id="seekBar" type="range" min="0" max="1000" value="0" step="1"
+               aria-label="Song progress" title="Click or drag to seek">
         <div class="time" id="timeText">0:00 / 0:00</div>
       </div>
     </div>
     <div class="controls">
+      <button class="ctrl-btn" id="back10Btn" title="back 10 seconds" aria-label="Back 10 seconds">↶10</button>
       <button class="ctrl-btn" id="prevBtn" title="previous">⏮</button>
       <button class="ctrl-btn play-btn" id="playBtn" title="play">▶</button>
       <button class="ctrl-btn" id="nextBtn" title="next">⏭</button>
+      <button class="ctrl-btn" id="forward10Btn" title="forward 10 seconds" aria-label="Forward 10 seconds">10↷</button>
     </div>
+  </div>
+
+  <div class="mixer" id="mixer">
+    <label class="mixer-control" title="Song volume">
+      <span>♫</span>
+      <input id="songVolume" type="range" min="0" max="100" value="100" step="1" aria-label="Song volume">
+    </label>
+    <label class="mixer-control" title="Rain volume">
+      <span>🌧</span>
+      <input id="rainVolume" type="range" min="0" max="100" value="35" step="1" aria-label="Rain volume">
+    </label>
   </div>
 </div>
 
@@ -492,12 +544,17 @@
   let userWantsToPlay = false;
   let consecutiveErrors = 0;
   const MAX_CONSECUTIVE_ERRORS = 6;
+  let songVolumeValue = 100;
+  let rainVolumeValue = 35;
+  let isSeeking = false;
 
   const playBtn = document.getElementById('playBtn');
   const trackTitle = document.getElementById('trackTitle');
   const trackArtist = document.getElementById('trackArtist');
-  const barFill = document.getElementById('barFill');
+  const seekBar = document.getElementById('seekBar');
   const timeText = document.getElementById('timeText');
+  const songVolume = document.getElementById('songVolume');
+  const rainVolume = document.getElementById('rainVolume');
   const thumb = document.getElementById('thumb');
 
   function fmt(s){
@@ -518,6 +575,7 @@
         onReady: () => {
           ytReady = true;
           ytPlayer.setShuffle(true);
+          ytPlayer.setVolume(songVolumeValue);
 
           const originalList = ytPlayer.getPlaylist() || [];
           pinnedSeedId = PINNED_SEED_VIDEO_ID || originalList[0] || null;
@@ -598,11 +656,54 @@
     if(!ytReady) return;
     const dur = ytPlayer.getDuration();
     const cur = ytPlayer.getCurrentTime();
-    if(dur > 0){
-      barFill.style.width = (cur/dur*100) + '%';
+    if(dur > 0 && !isSeeking){
+      const pct = Math.max(0, Math.min(100, (cur / dur) * 100));
+      seekBar.value = Math.round(pct * 10);
+      seekBar.style.setProperty('--seek', pct + '%');
       timeText.textContent = fmt(cur) + ' / ' + fmt(dur);
     }
   }
+
+  function seekToPercent(value){
+    if(!ytReady) return;
+    const dur = ytPlayer.getDuration();
+    if(dur > 0){
+      ytPlayer.seekTo((Number(value) / 1000) * dur, true);
+    }
+  }
+
+  function skipSeconds(seconds){
+    if(!ytReady) return;
+    const dur = ytPlayer.getDuration();
+    const cur = ytPlayer.getCurrentTime();
+    if(dur > 0){
+      ytPlayer.seekTo(Math.max(0, Math.min(dur, cur + seconds)), true);
+    }
+  }
+
+  seekBar.addEventListener('input', () => {
+    isSeeking = true;
+    const dur = ytReady ? ytPlayer.getDuration() : 0;
+    if(dur > 0){
+      const target = (Number(seekBar.value) / 1000) * dur;
+      seekBar.style.setProperty('--seek', (Number(seekBar.value) / 10) + '%');
+      timeText.textContent = fmt(target) + ' / ' + fmt(dur);
+    }
+  });
+  seekBar.addEventListener('change', () => {
+    seekToPercent(seekBar.value);
+    isSeeking = false;
+  });
+
+  document.getElementById('back10Btn').addEventListener('click', () => skipSeconds(-10));
+  document.getElementById('forward10Btn').addEventListener('click', () => skipSeconds(10));
+
+  // Keyboard shortcuts: ←/→ seek 10 seconds when the player is focused.
+  document.addEventListener('keydown', (e) => {
+    if(e.target.matches('input, textarea, select')) return;
+    if(e.key === 'ArrowLeft') { e.preventDefault(); skipSeconds(-10); }
+    if(e.key === 'ArrowRight') { e.preventDefault(); skipSeconds(10); }
+  });
 
   playBtn.addEventListener('click', () => {
     if(!ytReady) return;
@@ -617,12 +718,29 @@
   document.getElementById('nextBtn').addEventListener('click', () => { if(ytReady) ytPlayer.nextVideo(); });
   document.getElementById('prevBtn').addEventListener('click', () => { if(ytReady) ytPlayer.previousVideo(); });
 
+  // ---------- volume mixer ----------
+  songVolume.addEventListener('input', () => {
+    songVolumeValue = Number(songVolume.value);
+    if(ytReady) ytPlayer.setVolume(songVolumeValue);
+  });
+
   // ---------- rain ambience (real recording, loops until toggled off) ----------
   const rainAudio = document.getElementById('rainAudio');
   const rainToggle = document.getElementById('rainToggle');
   const rainLabel = document.getElementById('rainLabel');
   rainAudio.volume = 0;
   let rainActive = false;
+  rainVolumeValue = Number(rainVolume.value) / 100;
+
+  // HTMLMediaElement loop can introduce a tiny audible gap in some browsers.
+  // Restart immediately on ended as a fallback to minimize that gap.
+  rainAudio.loop = false;
+  rainAudio.addEventListener('ended', () => {
+    if(!rainActive) return;
+    rainAudio.currentTime = 0;
+    const p = rainAudio.play();
+    if(p) p.catch(()=>{});
+  });
   let rainFadeTimer = null;
 
   function fadeRain(target, ms){
@@ -636,6 +754,11 @@
     }, 40);
   }
 
+  rainVolume.addEventListener('input', () => {
+    rainVolumeValue = Number(rainVolume.value) / 100;
+    if(rainActive) rainAudio.volume = rainVolumeValue;
+  });
+
   rainToggle.addEventListener('click', () => {
     rainActive = !rainActive;
     rainToggle.classList.toggle('active', rainActive);
@@ -646,7 +769,7 @@
       rainAudio.play().catch(() => {
         setTimeout(() => rainAudio.play().catch(()=>{}), 150);
       });
-      fadeRain(0.35, 1200);
+      fadeRain(rainVolumeValue, 500);
     } else {
       fadeRain(0, 900);
       setTimeout(() => { if(!rainActive) rainAudio.pause(); }, 950);
